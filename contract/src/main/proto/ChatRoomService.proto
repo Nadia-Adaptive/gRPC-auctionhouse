@@ -1,0 +1,37 @@
+option java_package = "chatapp.RoomService";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "ResponseResult.proto";
+
+service  ChatRoomService {
+  rpc joinChatRoom(JoinChatRoomRequest) returns (ChatRoomResponse){}
+  rpc createChatRoom(CreateChatRoomRequest) returns (ChatRoomResponse){}
+  rpc removeChatRoom(RemoveChatRoomRequest) returns (ResponseResult){}
+  rpc getChatRooms(stream google.protobuf.Empty) returns (stream GetChatRoomResponse);
+}
+
+message JoinChatRoomRequest {
+  optional int32 roomId = 1;
+  optional int32 userId = 2;
+}
+
+message ChatRoomResponse {
+  optional string roomName = 1;
+  optional int32 roomId = 2;
+}
+
+message CreateChatRoomRequest {
+  optional int32 roomId = 1;
+  optional string roomName = 2;
+  optional int32 userId = 3;
+}
+
+message RemoveChatRoomRequest {
+  optional int32 roomId = 1;
+}
+
+message GetChatRoomResponse {
+  repeated ChatRoomResponse rooms = 1;
+  optional bool isInitialData = 2;
+}

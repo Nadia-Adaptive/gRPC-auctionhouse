@@ -1,0 +1,29 @@
+option java_package = "chatapp.ChatService";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "ResponseResult.proto";
+
+service ChatService {
+  rpc sendMessage(SendMessageRequest) returns (MessageResponse){}
+  rpc getMessages(stream google.protobuf.Empty) returns (stream MessagesResponse){}
+}
+
+message SendMessageRequest {
+  optional int32 roomId = 1;
+  optional int32 userId = 2;
+  optional string message = 3;
+}
+
+message MessageResponse {
+  optional string username = 1;
+  optional google.protobuf.Timestamp timestamp = 2;
+  optional string message = 3;
+  optional bool isLast = 4;
+  optional int32 messageId = 5;
+}
+
+message MessagesResponse {
+  repeated MessageResponse messages = 1;
+  optional bool isInitialState = 2;
+}

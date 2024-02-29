@@ -1,0 +1,34 @@
+version: '2'
+services:
+  server:
+    network_mode: host
+    container_name: chatServer
+    image: nadaptive/be_training:server
+    environment:
+      - CHAT_APP
+      - CHAT_PORT=50052
+    ports:
+      - "50051:50051"
+
+  client_1:
+    network_mode: host
+    container_name: clientOne
+    image: nadaptive/be_training:latest
+    environment:
+      - CHAT_APP
+      - CHAT_PORT=50052
+    tty: true
+    stdin_open: true
+
+  client_2:
+    network_mode: host
+    container_name: clientTwo
+    image: nadaptive/be_training:latest
+    environment:
+      - CHAT_APP
+      - CHAT_PORT=50052
+    tty: true
+    stdin_open: true
+
+
+
