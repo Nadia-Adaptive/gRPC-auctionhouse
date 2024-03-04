@@ -1,0 +1,30 @@
+plugins {
+    id 'com.wearadaptive.grpcchat.java-application-conventions'
+    id 'com.google.cloud.tools.jib' version '3.4.0'
+    id 'checkstyle'
+}
+jib.to.image = 'nadaptive/be_training:server'
+
+repositories {
+    mavenCentral()
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'com.wearadaptive.server.ServerMain'
+}
+
+dependencies {
+    implementation platform('io.projectreactor:reactor-bom:2023.0.3')
+    implementation 'io.projectreactor:reactor-core:3.6.3'
+
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.4'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.4'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.4'
+
+
+    testImplementation 'com.github.javafaker:javafaker:1.0.2'
+    testImplementation "org.mockito:mockito-core:5.+"
+    testImplementation 'io.projectreactor:reactor-test:3.6.3'
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.0")
+}

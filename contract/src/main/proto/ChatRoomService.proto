@@ -1,13 +1,13 @@
+syntax = "proto3";
 option java_package = "chatapp.RoomService";
 
-import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
-import "ResponseResult.proto";
+
 
 service  ChatRoomService {
   rpc joinChatRoom(JoinChatRoomRequest) returns (ChatRoomResponse){}
   rpc createChatRoom(CreateChatRoomRequest) returns (ChatRoomResponse){}
-  rpc removeChatRoom(RemoveChatRoomRequest) returns (ResponseResult){}
+  //rpc removeChatRoom(RemoveChatRoomRequest) returns (ResponseResult){}
   rpc getChatRooms(stream google.protobuf.Empty) returns (stream GetChatRoomResponse);
 }
 

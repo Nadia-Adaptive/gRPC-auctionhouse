@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option java_package = "com.weareadaptive.auctionhouse.organisation";
+option java_outer_classname = "gRPCOrganisationService";
+
+import "google/protobuf/empty.proto";
+import "user/UserService.proto";
+
+service OrganisationService {
+  rpc getOrganisation(GetOrganisationRequest) returns (OrganisationResponse){}
+  rpc subscribeToGetOrganisationService(stream google.protobuf.Empty) returns (stream OrganisationsResponse){}
+}
+
+message OrganisationResponse {
+  int32 organisationId = 1;
+  string organisationName = 2;
+  repeated UserResponse users = 3;
+}
+
+message GetOrganisationRequest {
+  int32 organisationId = 1;
+}
+
+message OrganisationsResponse {
+  bool initialData = 1;
+  repeated OrganisationResponse organisations = 2;
+}

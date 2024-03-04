@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+option java_package = "com.weareadaptive.auctionhouse.Auction";
+option java_outer_classname = "gRPCBidService";
+
+import "google/protobuf/timestamp.proto";
+
+service BidService{
+  rpc createBid(CreateBidRequest) returns (BidResponse){}
+}
+
+message BidResponse {
+  int32 auctionId = 1;
+  int32 bidderId = 2;
+  double offerPrice = 3;
+  int32 quantity = 4;
+  google.protobuf.Timestamp timestamp = 5;
+  int32 bidId = 6;
+  BidStatusValue BidStatus = 7;
+  int32 totalFilled = 8;
+}
+
+message BidsResponse {
+  bool initialData = 1;
+  repeated BidResponse bids = 2;
+}
+
+enum BidStatusValue {
+  PENDING = 0;
+  UNFILLED = 1;
+  PARTIAL_FILL = 2;
+  FILLED = 3;
+}
+
+message CreateBidRequest {
+  string product = 1;
+  int32 offerPrice = 2;
+  int32 quantity = 3;
+  int32 auctionId = 4;
+}

@@ -1,8 +1,8 @@
+syntax = "proto3";
 option java_package = "chatapp.ChatService";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
-import "ResponseResult.proto";
 
 service ChatService {
   rpc sendMessage(SendMessageRequest) returns (MessageResponse){}

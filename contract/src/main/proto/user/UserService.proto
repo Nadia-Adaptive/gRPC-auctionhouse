@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+option java_package = "com.weareadaptive.auctionhouse.user";
+option java_outer_classname = "gRPCUserService";
+
+import "google/protobuf/empty.proto";
+import "auction/AuctionService.proto";
+
+service UserService {
+  rpc createUser(CreateUserRequest) returns (UserResponse){}
+  rpc getUser(GetUserRequest) returns (UserResponse){}
+  rpc updateUser(UpdateUserRequest) returns (UserResponse){}
+  rpc updateUserAccess(UpdateUserAccessRequest) returns (UserResponse){}
+  rpc subscribeToGetUsersService(stream google.protobuf.Empty) returns (stream UsersResponse){}
+  rpc getUserAuctions(google.protobuf.Empty) returns (AuctionsResponse){}
+}
+
+enum AccessStatusValue {
+  ALLOWED = 0;
+  BLOCKED = 1;
+}
+
+enum UserRoleValue {
+  USER = 0;
+  ADMIN = 1;
+}
+
+message UserResponse {
+  int32 userId = 1;
+  string username = 2;
+  string password = 3;
+  string firstName = 4;
+  string lastName = 5;
+  string organisationName = 6;
+  UserRoleValue userRole = 7;
+  AccessStatusValue accessStatus = 8;
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string password = 2;
+  string firstName = 3;
+  string lastName = 4;
+  string organisationName = 5;
+  UserRoleValue userRole = 6;
+  AccessStatusValue accessStatus = 7;
+}
+
+message UpdateUserRequest {
+  int32 userId = 1;
+  string password = 2;
+  string firstName = 3;
+  string lastName = 4;
+  string organisationName = 5;
+}
+
+message UpdateUserAccessRequest {
+  int32 userId = 1;
+  AccessStatusValue accessStatus = 2;
+}
+
+message GetUserRequest {
+  int32 userId = 1;
+}
+
+message UsersResponse {
+  bool initialData = 1;
+  repeated UserResponse users = 2;
+}
+
+message RemoveUser {
+  int32 userId = 1;
+}
