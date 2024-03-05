@@ -5,14 +5,22 @@ import com.weareadaptive.auctionhouse.auction.AuctionRepository;
 import com.weareadaptive.auctionhouse.exception.BusinessException;
 import com.weareadaptive.auctionhouse.exception.NotFoundException;
 import com.weareadaptive.auctionhouse.organisation.OrganisationRepository;
+import com.weareadaptive.auctionhouse.user.gRPCUserService.UsersResponse;
 import com.weareadaptive.auctionhouse.utils.StringUtil;
+import reactor.core.publisher.Sinks;
 
 import java.util.List;
+
+import static com.weareadaptive.auctionhouse.user.UserMapper.mapToUsersResponse;
+import static reactor.util.concurrent.Queues.SMALL_BUFFER_SIZE;
 
 public class UserService {
     private final UserRepository userRepository;
     private final OrganisationRepository organisationRepository;
     private final AuctionRepository auctionRepository;
+
+    private final Sinks.Many<UsersResponse> usersSink =
+            Sinks.many().multicast().onBackpressureBuffer(SMALL_BUFFER_SIZE, false);
 
     public UserService(final UserRepository userRepository, final OrganisationRepository organisationRepository,
                        final AuctionRepository auctionRepository) {
@@ -42,10 +50,11 @@ public class UserService {
         final var user = userRepository.save(
                 new User(userRepository.nextId(), request.username(), request.password(), request.firstName(),
                         request.lastName(), organisation.getOrganisationName(),
-                        request.userRole())); // TODO: Time provider
+                        request.userRole()));
         if (user == null) {
-            throw new BusinessException("Something went wrong.");
+            throw new BusinessException("Something went wrong");
         }
+        usersSink.tryEmitNext(mapToUsersResponse(user));
         return user;
     }
 
@@ -56,7 +65,7 @@ public class UserService {
     public User getUser(final int id) {
         final var user = userRepository.findById(id);
         if (user == null) {
-            throw new NotFoundException("User does not exist.");
+            throw new NotFoundException("User not found");
         }
         return user;
     }
@@ -65,7 +74,7 @@ public class UserService {
         final var user = userRepository.findById(request.userId());
 
         if (user == null) {
-            throw new NotFoundException("User does not exist.");
+            throw new NotFoundException("User not found");
         }
 
         if (!StringUtil.isNullOrEmpty(request.password())) {
@@ -86,6 +95,7 @@ public class UserService {
         }
 
         userRepository.save(user);
+        usersSink.tryEmitNext(mapToUsersResponse(user));
         return user;
     }
 
@@ -93,7 +103,7 @@ public class UserService {
         final var user = userRepository.findById(dto.userId());
 
         if (user == null) {
-            throw new NotFoundException("User does not exist.");
+            throw new NotFoundException("User not found");
         }
 
         user.setAccessStatus(dto.status());
@@ -102,8 +112,12 @@ public class UserService {
 
     public List<Auction> getUserAuctions(final int id) {
         if (!userRepository.existsById(id)) {
-            throw new NotFoundException("User does not exist.");
+            throw new NotFoundException("User not found");
         }
         return auctionRepository.findUserAuctions(id);
+    }
+
+    public Sinks.Many<UsersResponse> getSubscription() {
+        return usersSink;
     }
 }

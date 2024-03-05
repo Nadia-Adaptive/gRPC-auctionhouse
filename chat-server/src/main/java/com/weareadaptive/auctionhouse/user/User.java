@@ -1,9 +1,10 @@
 package com.weareadaptive.auctionhouse.user;
 
 import com.weareadaptive.auctionhouse.exception.BusinessException;
-import com.weareadaptive.auctionhouse.utils.StringUtil;
 
 import java.util.Objects;
+
+import static com.weareadaptive.auctionhouse.utils.StringUtil.isNullOrEmpty;
 
 public class User {
     private int userId;
@@ -17,23 +18,23 @@ public class User {
 
     public User(final int userId, final String username, final String password, final String firstName,
                 final String lastName, final String organisationName, final UserRole userRole) {
-        if (StringUtil.isNullOrEmpty(username)) {
+        if (isNullOrEmpty(username)) {
+            throw new BusinessException("username cannot be null or empty");
+        }
+        if (isNullOrEmpty(password)) {
             throw new BusinessException("password cannot be null or empty");
         }
-        if (StringUtil.isNullOrEmpty(password)) {
-            throw new BusinessException("password cannot be null or empty");
-        }
-        if (StringUtil.isNullOrEmpty(firstName)) {
+        if (isNullOrEmpty(firstName)) {
             throw new BusinessException("firstName cannot be null or empty");
         }
-        if (StringUtil.isNullOrEmpty(lastName)) {
+        if (isNullOrEmpty(lastName)) {
             throw new BusinessException("lastName cannot be null or empty");
         }
-        if (StringUtil.isNullOrEmpty(organisationName)) {
+        if (isNullOrEmpty(organisationName)) {
             throw new BusinessException("organisationName cannot be null or empty");
         }
         if (userRole == null) {
-            throw new BusinessException("User Role cannot be null");
+            throw new BusinessException("userRole cannot be null");
         }
 
         this.userId = userId;

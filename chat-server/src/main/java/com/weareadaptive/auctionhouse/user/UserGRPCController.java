@@ -11,16 +11,16 @@ import com.weareadaptive.auctionhouse.user.gRPCUserService.CreateUserRequest;
 import com.weareadaptive.auctionhouse.user.gRPCUserService.GetUserRequest;
 import com.weareadaptive.auctionhouse.user.gRPCUserService.UpdateUserAccessRequest;
 import com.weareadaptive.auctionhouse.user.gRPCUserService.UpdateUserRequest;
+import com.weareadaptive.auctionhouse.user.gRPCUserService.UpdateUserResponse;
 import com.weareadaptive.auctionhouse.user.gRPCUserService.UserResponse;
 import com.weareadaptive.auctionhouse.user.gRPCUserService.UsersResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.Sinks;
-
-import java.util.List;
 
 import static com.weareadaptive.auctionhouse.observability.ApplicationLogger.info;
+import static com.weareadaptive.auctionhouse.user.UserMapper.mapToUpdateUserResponse;
 import static com.weareadaptive.auctionhouse.user.UserMapper.mapToUserResponse;
+import static com.weareadaptive.auctionhouse.user.UserMapper.mapToUsersResponse;
 import static com.weareadaptive.auctionhouse.utils.DTOMappers.mapToGRPCError;
 import static io.grpc.Status.INTERNAL;
 import static io.grpc.Status.INVALID_ARGUMENT;
@@ -30,19 +30,23 @@ import static io.grpc.Status.UNAUTHENTICATED;
 public class UserGRPCController extends UserServiceImplBase {
     private final UserService userService;
     private final OrganisationService organisationService;
-    private final Sinks.Many<UsersResponse> userSink = Sinks.many().multicast().onBackpressureBuffer();
 
-    public UserGRPCController() {
-        this.userService = ApplicationContext.getApplicationContext().getUserService();
-        this.organisationService = ApplicationContext.getApplicationContext().getOrganisationService();
+
+    public UserGRPCController(final ApplicationContext context) {
+        this.userService = context.getUserService();
+        this.organisationService = context.getOrganisationService();
     }
 
     @Override
     public Flux<UsersResponse> subscribeToGetUsersService(final Flux<Empty> request) {
         info("All users requested.");
 
+        final var userSink = userService.getSubscription();
+        userSink.tryEmitNext(mapToUsersResponse(userService.getUsers(), true));
+
         return userSink.asFlux();
     }
+
 
     @Override
     public Mono<UserResponse> getUser(final Mono<GetUserRequest> request) {
@@ -72,8 +76,6 @@ public class UserGRPCController extends UserServiceImplBase {
 
                         final var user = userService.createUser((r));
 
-                        userSink.tryEmitNext(UserMapper.mapToGetResponses(List.of(user), false));
-
                         sink.next(mapToUserResponse(user));
                     } catch (final InternalErrorException | IndexOutOfBoundsException e) {
                         sink.error(mapToGRPCError(INTERNAL, e));
@@ -86,11 +88,11 @@ public class UserGRPCController extends UserServiceImplBase {
     }
 
     @Override
-    public Mono<UserResponse> updateUser(final Mono<UpdateUserRequest> request) {
+    public Mono<UpdateUserResponse> updateUser(final Mono<UpdateUserRequest> request) {
         return request.map(UserMapper::mapToUpdateUserDTO).handle((r, sink) -> {
             info("Request to update userRole with id " + r.userId() + ".");
             try {
-                sink.next(mapToUserResponse(userService.updateUser(r)));
+                sink.next(mapToUpdateUserResponse(userService.updateUser(r), !r.password().isEmpty()));
             } catch (final NotFoundException e) {
                 sink.error(mapToGRPCError(NOT_FOUND, e));
             } catch (final InternalErrorException e) {

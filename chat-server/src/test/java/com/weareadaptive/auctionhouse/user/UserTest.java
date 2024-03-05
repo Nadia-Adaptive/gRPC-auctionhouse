@@ -23,6 +23,8 @@ public class UserTest {
         return Stream.of(
                 Arguments.of("username",
                         (Executable) () -> new User(USER_ID, null, "password", "first", "last", ORG_1, UserRole.USER)),
+                Arguments.of("password",
+                        (Executable) () -> new User(USER_ID, "username", null, "first", "last", ORG_1, UserRole.USER)),
                 Arguments.of("firstName",
                         (Executable) () -> new User(USER_ID, "username", "password", null, "last", ORG_1,
                                 UserRole.USER)),

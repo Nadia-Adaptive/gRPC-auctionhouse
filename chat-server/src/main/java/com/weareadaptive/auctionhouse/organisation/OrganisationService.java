@@ -60,7 +60,7 @@ public class OrganisationService {
         final var organisation = repository.save(new Organisation(repository.nextId(), organisationName));
 
         subscriptionSink.tryEmitNext(OrganisationMapper.mapToOrganisationsResponse(organisation, false));
-        System.out.println("SCREAM");
+
         return organisation;
     }
 

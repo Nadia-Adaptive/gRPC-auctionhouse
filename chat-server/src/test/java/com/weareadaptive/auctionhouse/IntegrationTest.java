@@ -10,30 +10,22 @@ import io.grpc.inprocess.InProcessServerBuilder;
 import io.grpc.testing.GrpcCleanupRule;
 import org.junit.jupiter.api.BeforeEach;
 
-import static com.weareadaptive.auctionhouse.configuration.ApplicationContext.getApplicationContext;
-
 public abstract class IntegrationTest {
-    //private MockApplicationContext context;
-    // TODO: Add the setup code below to MockApplicationContext
-    //    userRepo = new UserRepository();
-    //        userRepo.addUser("User01");
-    //        roomRepo = new com.weareadaptive.server.room.ChatRoomRepository();
-
     protected ManagedChannel channel;
-    private ApplicationContext context;
+    protected ApplicationContext context;
     protected IntegrationTestData testData;
 
     @BeforeEach
     public void setup() throws Exception {
-        context = getApplicationContext();
+        context = new ApplicationContext();
 
         final var grpcCleanupRule = new GrpcCleanupRule();
         final var serverName = InProcessServerBuilder.generateName();
 
         grpcCleanupRule.register(
                 InProcessServerBuilder.forName(serverName).directExecutor()
-                        .addService(new OrganisationGRPCController())
-                        .addService(new UserGRPCController())
+                        .addService(new OrganisationGRPCController(context))
+                        .addService(new UserGRPCController(context))
                         .build()
                         .start());
 

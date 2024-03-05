@@ -4,6 +4,7 @@ import com.weareadaptive.auctionhouse.user.gRPCUserService.AccessStatusValue;
 import com.weareadaptive.auctionhouse.user.gRPCUserService.CreateUserRequest;
 import com.weareadaptive.auctionhouse.user.gRPCUserService.UpdateUserAccessRequest;
 import com.weareadaptive.auctionhouse.user.gRPCUserService.UpdateUserRequest;
+import com.weareadaptive.auctionhouse.user.gRPCUserService.UpdateUserResponse;
 import com.weareadaptive.auctionhouse.user.gRPCUserService.UserResponse;
 import com.weareadaptive.auctionhouse.user.gRPCUserService.UsersResponse;
 
@@ -36,15 +37,6 @@ public final class UserMapper {
                 UserRole.valueOf(request.getUserRole().name()));
     }
 
-    public static UsersResponse mapToGetResponses(final List<User> users, final boolean isInitialData) {
-        return UsersResponse.newBuilder()
-                .addAllUsers(users.stream()
-                        .map(UserMapper::mapToUserResponse)
-                        .toList())
-                .setInitialData(isInitialData)
-                .build();
-    }
-
     public static UserUpdateDTO mapToUpdateUserDTO(final UpdateUserRequest request) {
         return new UserUpdateDTO(request.getUserId(), request.getPassword(), request.getFirstName(),
                 request.getLastName(), request.getOrganisationName());
@@ -56,5 +48,23 @@ public final class UserMapper {
 
     public static List<UserResponse> mapToUserResponseList(final List<User> users) {
         return users.stream().map(UserMapper::mapToUserResponse).toList();
+    }
+
+    public static UpdateUserResponse mapToUpdateUserResponse(final User updateUser, final boolean passwordChange) {
+        return UpdateUserResponse.newBuilder().setUser(mapToUserResponse(updateUser)).setPasswordChanged(passwordChange)
+                .build();
+    }
+
+    public static UsersResponse mapToUsersResponse(final List<User> users, final boolean isInitialData) {
+        return UsersResponse.newBuilder()
+                .addAllUsers(users.stream()
+                        .map(UserMapper::mapToUserResponse)
+                        .toList())
+                .setInitialData(isInitialData)
+                .build();
+    }
+
+    public static UsersResponse mapToUsersResponse(final User user) {
+        return mapToUsersResponse(List.of(user), false);
     }
 }

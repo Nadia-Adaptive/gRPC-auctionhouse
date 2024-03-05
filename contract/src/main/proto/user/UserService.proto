@@ -9,7 +9,7 @@ import "auction/AuctionService.proto";
 service UserService {
   rpc createUser(CreateUserRequest) returns (UserResponse){}
   rpc getUser(GetUserRequest) returns (UserResponse){}
-  rpc updateUser(UpdateUserRequest) returns (UserResponse){}
+  rpc updateUser(UpdateUserRequest) returns (UpdateUserResponse){}
   rpc updateUserAccess(UpdateUserAccessRequest) returns (UserResponse){}
   rpc subscribeToGetUsersService(stream google.protobuf.Empty) returns (stream UsersResponse){}
   rpc getUserAuctions(google.protobuf.Empty) returns (AuctionsResponse){}
@@ -28,7 +28,6 @@ enum UserRoleValue {
 message UserResponse {
   int32 userId = 1;
   string username = 2;
-  string password = 3;
   string firstName = 4;
   string lastName = 5;
   string organisationName = 6;
@@ -52,6 +51,11 @@ message UpdateUserRequest {
   string firstName = 3;
   string lastName = 4;
   string organisationName = 5;
+}
+
+message UpdateUserResponse {
+  bool passwordChanged = 1;
+  UserResponse user = 2;
 }
 
 message UpdateUserAccessRequest {

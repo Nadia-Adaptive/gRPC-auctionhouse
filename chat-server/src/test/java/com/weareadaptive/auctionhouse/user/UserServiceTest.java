@@ -18,8 +18,10 @@ import static com.weareadaptive.auctionhouse.TestData.ORG_1;
 import static com.weareadaptive.auctionhouse.TestData.ORG_2;
 import static com.weareadaptive.auctionhouse.TestData.UID_1;
 import static com.weareadaptive.auctionhouse.TestData.UID_2;
+import static com.weareadaptive.auctionhouse.TestData.UID_404;
 import static com.weareadaptive.auctionhouse.TestData.USER1;
 import static com.weareadaptive.auctionhouse.TestData.USER2;
+import static com.weareadaptive.auctionhouse.user.AccessStatus.BLOCKED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,7 +32,7 @@ import static org.mockito.Mockito.when;
 public class UserServiceTest {
     private UserService userService;
     private OrganisationRepository organisationRepo;
-    private UserAccessDTO accessRequest = new UserAccessDTO(UID_1, AccessStatus.BLOCKED);
+    private UserAccessDTO accessRequest = new UserAccessDTO(UID_1, BLOCKED);
     private CreateUserDTO createRequest = new CreateUserDTO("password", "password",
             "firstName", "lastName", ORG_1, UserRole.USER);
 
@@ -103,16 +105,16 @@ public class UserServiceTest {
     }
 
     @Test()
-    @DisplayName("update should throws a business exception when passed invalid password")
+    @DisplayName("updateUserStatus changes a user's access status")
     public void updateUserStatus() {
         final var user = userService.updateUserStatus(accessRequest);
-        assertEquals(AccessStatus.BLOCKED, user.getAccessStatus());
+        assertEquals(BLOCKED, user.getAccessStatus());
     }
 
     @Test()
-    @DisplayName("update should throws a business exception when passed invalid password")
+    @DisplayName("update throws when passed invalid id")
     public void updateUserStatusPassedInvalidId() {
-        assertThrows(NotFoundException.class, () -> userService.updateUserStatus(accessRequest));
+        assertThrows(NotFoundException.class, () -> userService.updateUserStatus(new UserAccessDTO(UID_404, BLOCKED)));
     }
 
     @Test()

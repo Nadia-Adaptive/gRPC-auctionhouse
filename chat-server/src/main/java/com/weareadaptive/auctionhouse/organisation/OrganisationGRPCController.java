@@ -1,6 +1,7 @@
 package com.weareadaptive.auctionhouse.organisation;
 
 import com.google.protobuf.Empty;
+import com.weareadaptive.auctionhouse.configuration.ApplicationContext;
 import com.weareadaptive.auctionhouse.exception.NotFoundException;
 import com.weareadaptive.auctionhouse.organisation.ReactorOrganisationServiceGrpc.OrganisationServiceImplBase;
 import com.weareadaptive.auctionhouse.organisation.gRPCOrganisationService.GetOrganisationRequest;
@@ -11,16 +12,16 @@ import io.grpc.Status;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static com.weareadaptive.auctionhouse.configuration.ApplicationContext.getApplicationContext;
 import static com.weareadaptive.auctionhouse.observability.ApplicationLogger.info;
 import static com.weareadaptive.auctionhouse.organisation.OrganisationMapper.mapToOrganisationResponse;
 import static com.weareadaptive.auctionhouse.organisation.OrganisationMapper.mapToOrganisationsResponse;
 import static java.lang.System.out;
 
 public class OrganisationGRPCController extends OrganisationServiceImplBase {
-    private final OrganisationService service = getApplicationContext().getOrganisationService();
+    private final OrganisationService service;
 
-    public OrganisationGRPCController() {
+    public OrganisationGRPCController(final ApplicationContext context) {
+        service = context.getOrganisationService();
     }
 
     @Override

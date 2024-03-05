@@ -23,7 +23,7 @@ class OrganisationGRPCControllerTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("GetAllOrganisations_ReturnsAllOrganisations")
+    @DisplayName("Subscribing to GetOrganisationService emits an initial set of data")
     void getAllOrganisations() {
         final var source = stub.subscribeToGetOrganisationService(Flux.just(Empty.newBuilder().build()));
 
@@ -35,7 +35,19 @@ class OrganisationGRPCControllerTest extends IntegrationTest {
     }
 
     @Test
-    @DisplayName("GetOrganisation_InvalidId_ReturnsMessage")
+    @DisplayName("GetOrganisation returns an organisation")
+    void getOrganisation() {
+        final var source =
+                stub.getOrganisation(Mono.just(GetOrganisationRequest.newBuilder().setOrganisationId(1).build()));
+
+        StepVerifier
+                .create(source)
+                .expectNextMatches(o -> o.getOrganisationName().equals("ADMIN"))
+                .verifyComplete();
+    }
+
+    @Test
+    @DisplayName("GetOrganisation returns an error message when organisation does not exist")
     void getOrganisationInvalidId() {
         final var source =
                 stub.getOrganisation(Mono.just(GetOrganisationRequest.newBuilder().setOrganisationId(-1).build()));

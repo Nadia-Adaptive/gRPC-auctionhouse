@@ -13,7 +13,7 @@ import com.weareadaptive.auctionhouse.user.UserRepository;
 import com.weareadaptive.auctionhouse.user.UserRole;
 import com.weareadaptive.auctionhouse.user.UserService;
 
-public final class ApplicationContext {
+public class ApplicationContext {
     private final UserRepository userRepo;
     private final OrganisationRepository organisationRepo;
     private final AuthenticationService authenticationService;
@@ -24,7 +24,7 @@ public final class ApplicationContext {
     private final AuctionService auctionService;
     private final BidRepository bidRepo;
 
-    private ApplicationContext() {
+    public ApplicationContext() {
         // Initialise repositories
         userRepo = new UserRepository();
         organisationRepo = new OrganisationRepository();
@@ -43,9 +43,6 @@ public final class ApplicationContext {
     }
 
     public static ApplicationContext getApplicationContext() {
-        if (context == null) {
-            context = new ApplicationContext();
-        }
         return context;
     }
 
